@@ -64,12 +64,10 @@ public class CarController : MonoBehaviour
         // ระบบเบรค
         isBraking = Input.GetKey(KeyCode.Space);
 
-        // รับค่าป้อนเข้า
         steerInput = 0f;
         if (Input.GetKey(KeyCode.LeftArrow)) steerInput = -1f;
         if (Input.GetKey(KeyCode.RightArrow)) steerInput = 1f;
 
-        // รับค่าป้อนเข้าสำหรับการเคลื่อนที่
         moveInput = 0f;
         if (currentGear == GearMode.D && Input.GetKey(KeyCode.UpArrow)) moveInput = 1f;
         if (currentGear == GearMode.R && Input.GetKey(KeyCode.DownArrow)) moveInput = -1f;
@@ -77,7 +75,7 @@ public class CarController : MonoBehaviour
 
     void UpdateSteeringWheel()
     {
-        // ปรับพวงมาลัยอย่างลื่นไหล
+        // smoothly wheel
         currentSteerInput = Mathf.MoveTowards(currentSteerInput, steerInput,
             steeringReturnSpeed * Time.deltaTime / steeringWheelMaxAngle);
 
@@ -112,7 +110,7 @@ public class CarController : MonoBehaviour
             }
         }
 
-        // ค่อยๆ ปรับความเร็วให้เข้าใกล้ความเร็วเป้าหมาย
+        // Accelerate or decelerate
         if (!isBraking)
         {
             if (Mathf.Abs(targetSpeed) > Mathf.Abs(currentSpeed))
@@ -127,7 +125,6 @@ public class CarController : MonoBehaviour
             }
         }
 
-        // นำความเร็วไปใช้กับรถ
         Vector3 forwardMovement = transform.forward * currentSpeed;
         rb.linearVelocity = new Vector3(forwardMovement.x, rb.linearVelocity.y, forwardMovement.z);
     }
@@ -148,10 +145,10 @@ public class CarController : MonoBehaviour
     {
         if (isBraking)
         {
-            // ลดความเร็วอย่างรวดเร็วเมื่อเบรค
+            // ลดความเร็ว
             currentSpeed = Mathf.MoveTowards(currentSpeed, 0f, brakeForce * Time.fixedDeltaTime);
 
-            // เพิ่มแรงต้านเมื่อเบรค (optional)
+            // เพิ่มแรงต้านตอนเบรค 
             rb.AddForce(-rb.linearVelocity * brakeForce * 0.5f, ForceMode.Acceleration);
         }
     }
