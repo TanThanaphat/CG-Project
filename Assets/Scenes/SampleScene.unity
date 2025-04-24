@@ -703,8 +703,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49c1bc9d8206e3e4f860bc64b7170fed, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 10
+  maxSpeed: 20
+  acceleration: 5
+  deceleration: 8
+  brakeForce: 15
   turnSpeed: 60
+  reverseSpeedMultiplier: 0.5
   steeringWheel: {fileID: 2095638748}
   steeringWheelMaxAngle: 45
   steeringReturnSpeed: 90
