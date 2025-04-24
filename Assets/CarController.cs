@@ -2,27 +2,38 @@
 
 public class CarController : MonoBehaviour
 {
-    public float acceleration = 5f;              // ความเร่ง
-    public float maxSpeed = 17f;                  // ความเร็วสูงสุด (m/s)
-    public float turnSpeed = 100f;                // ความเร็วหมุนรถ
-    public float brakeStrength = 50f;             // ความแรงเบรก
-    public Transform steeringWheel;               // พวงมาลัย
-    public float steeringWheelMaxAngle = 45f;     // องศาหมุนพวงมาลัยสูงสุด
-    public float steeringReturnSpeed = 90f;       // ความเร็วที่พวงมาลัยคืนศูนย์
-    public Rigidbody rb;                          // Rigidbody
+    [Header("Movement Settings")]
+    public float maxSpeed = 30f;                 // ความเร็วสูงสุด
+    public float acceleration = 5f;              // อัตราการเร่ง
+    public float deceleration = 8f;              // อัตราการชะลอ
+    public float brakeForce = 15f;               // แรงเบรค
+    public float turnSpeed = 100f;               // ความเร็วหมุนรถ
+    public float reverseSpeedMultiplier = 0.5f;  // ความเร็วเมื่อถอยหลัง
 
+    [Header("Steering Wheel Settings")]
+    public Transform steeringWheel;              // พวงมาลัย
+    public float steeringWheelMaxAngle = 45f;    // องศาหมุนพวงมาลัยสูงสุด
+    public float steeringReturnSpeed = 90f;      // ความเร็วที่พวงมาลัยคืนศูนย์
+
+    [Header("References")]
+    public Rigidbody rb;
+
+    private float currentSpeed = 0f;
     private float moveInput;
     private float steerInput;
     private float currentSteerInput;
-    private float currentSpeed;
+    private bool isBraking = false;
 
-    private Quaternion initialSteeringRotation;
+    private Quaternion initialSteeringRotation;  // ค่าเริ่มต้นของพวงมาลัย
 
     public enum GearMode { P, D, R }
-    public GearMode currentGear = GearMode.D;
-    public GearMode CurrentGear => currentGear;
+    public GearMode currentGear = GearMode.P;
+    public GearMode CurrentGear
+    {
+        get { return currentGear; }
+    }
 
-    public float CurrentSpeed => rb != null ? rb.linearVelocity.magnitude * 3.6f : 0f; // แสดง km/h
+    public float CurrentSpeed => rb != null ? rb.linearVelocity.magnitude * 3.6f : 0f;
 
     void Start()
     {
@@ -31,30 +42,45 @@ public class CarController : MonoBehaviour
             initialSteeringRotation = steeringWheel.localRotation;
         }
 
+        if (rb == null)
+        {
+            rb = GetComponent<Rigidbody>();
+        }
     }
 
     void Update()
     {
-        moveInput = 0f;
-        steerInput = 0f;
+        HandleInput();
+        UpdateSteeringWheel();
+    }
 
+    void HandleInput()
+    {
         // ระบบเกียร์
         if (Input.GetKeyDown(KeyCode.P)) currentGear = GearMode.P;
         if (Input.GetKeyDown(KeyCode.D)) currentGear = GearMode.D;
         if (Input.GetKeyDown(KeyCode.R)) currentGear = GearMode.R;
 
-        // พวงมาลัยซ้ายขวา
+        // ระบบเบรค
+        isBraking = Input.GetKey(KeyCode.Space);
+
+        // รับค่าป้อนเข้า
+        steerInput = 0f;
         if (Input.GetKey(KeyCode.LeftArrow)) steerInput = -1f;
         if (Input.GetKey(KeyCode.RightArrow)) steerInput = 1f;
 
-        // อินพุตการเคลื่อนที่
+        // รับค่าป้อนเข้าสำหรับการเคลื่อนที่
+        moveInput = 0f;
         if (currentGear == GearMode.D && Input.GetKey(KeyCode.UpArrow)) moveInput = 1f;
         if (currentGear == GearMode.R && Input.GetKey(KeyCode.DownArrow)) moveInput = -1f;
+    }
 
-        // พวงมาลัยสมูท
-        currentSteerInput = Mathf.MoveTowards(currentSteerInput, steerInput, steeringReturnSpeed * Time.deltaTime / steeringWheelMaxAngle);
+    void UpdateSteeringWheel()
+    {
+        // ปรับพวงมาลัยอย่างลื่นไหล
+        currentSteerInput = Mathf.MoveTowards(currentSteerInput, steerInput,
+            steeringReturnSpeed * Time.deltaTime / steeringWheelMaxAngle);
 
-        // หมุนพวงมาลัยโมเดล
         if (steeringWheel != null)
         {
             float steerAngle = currentSteerInput * steeringWheelMaxAngle;
@@ -67,27 +93,66 @@ public class CarController : MonoBehaviour
         if (rb == null) return;
         if (currentGear == GearMode.P) return;
 
-        // เบรก
-        if (Input.GetKey(KeyCode.Space))
+        HandleMovement();
+        HandleSteering();
+        ApplyBraking();
+    }
+
+    void HandleMovement()
+    {
+        float targetSpeed = 0f;
+
+        // คำนวณความเร็วเป้าหมาย
+        if (moveInput > 0.1f || moveInput < -0.1f)
         {
-            rb.linearVelocity = Vector3.MoveTowards(rb.linearVelocity, Vector3.zero, brakeStrength * Time.fixedDeltaTime);
-            return;
+            targetSpeed = moveInput * maxSpeed;
+            if (currentGear == GearMode.R)
+            {
+                targetSpeed *= reverseSpeedMultiplier;
+            }
         }
 
-        // เร่งความเร็ว
-        Vector3 desiredVelocity = transform.forward * moveInput * maxSpeed;
-        Vector3 velocityChange = desiredVelocity - rb.linearVelocity;
-        Vector3 accelerationForce = Vector3.ClampMagnitude(velocityChange, acceleration) * rb.mass;
-
-        rb.AddForce(accelerationForce, ForceMode.Force);
-
-        // หมุนรถ (ถ้ามีการเคลื่อนที่)
-        if (Mathf.Abs(rb.linearVelocity.magnitude) > 0.1f)
+        // ค่อยๆ ปรับความเร็วให้เข้าใกล้ความเร็วเป้าหมาย
+        if (!isBraking)
         {
-            float direction = Vector3.Dot(rb.linearVelocity, transform.forward) >= 0 ? 1f : -1f;
+            if (Mathf.Abs(targetSpeed) > Mathf.Abs(currentSpeed))
+            {
+                // เร่งความเร็ว
+                currentSpeed = Mathf.MoveTowards(currentSpeed, targetSpeed, acceleration * Time.fixedDeltaTime);
+            }
+            else
+            {
+                // ชะลอความเร็วเมื่อปล่อยปุ่ม
+                currentSpeed = Mathf.MoveTowards(currentSpeed, targetSpeed, deceleration * Time.fixedDeltaTime);
+            }
+        }
+
+        // นำความเร็วไปใช้กับรถ
+        Vector3 forwardMovement = transform.forward * currentSpeed;
+        rb.linearVelocity = new Vector3(forwardMovement.x, rb.linearVelocity.y, forwardMovement.z);
+    }
+
+    void HandleSteering()
+    {
+        // หมุนรถเมื่อมีความเร็ว
+        if (Mathf.Abs(currentSpeed) > 0.1f)
+        {
+            float direction = currentSpeed > 0 ? 1f : -1f;
             float turn = steerInput * turnSpeed * Time.fixedDeltaTime * direction;
             Quaternion turnRotation = Quaternion.Euler(0f, turn, 0f);
             rb.MoveRotation(rb.rotation * turnRotation);
+        }
+    }
+
+    void ApplyBraking()
+    {
+        if (isBraking)
+        {
+            // ลดความเร็วอย่างรวดเร็วเมื่อเบรค
+            currentSpeed = Mathf.MoveTowards(currentSpeed, 0f, brakeForce * Time.fixedDeltaTime);
+
+            // เพิ่มแรงต้านเมื่อเบรค (optional)
+            rb.AddForce(-rb.linearVelocity * brakeForce * 0.5f, ForceMode.Acceleration);
         }
     }
 }

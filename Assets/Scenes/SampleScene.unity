@@ -703,10 +703,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49c1bc9d8206e3e4f860bc64b7170fed, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  acceleration: 10
-  maxSpeed: 15
+  moveSpeed: 10
   turnSpeed: 60
-  brakeStrength: 50
   steeringWheel: {fileID: 2095638748}
   steeringWheelMaxAngle: 45
   steeringReturnSpeed: 90
@@ -807,6 +805,14 @@ PrefabInstance:
     - target: {fileID: 161566, guid: ffe00fa3bd41b9a4db665bf728e3c1e1, type: 3}
       propertyPath: m_Name
       value: Cartoon-SportCar_Unity_setup
+      objectReference: {fileID: 0}
+    - target: {fileID: 411512, guid: ffe00fa3bd41b9a4db665bf728e3c1e1, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 411512, guid: ffe00fa3bd41b9a4db665bf728e3c1e1, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.9
       objectReference: {fileID: 0}
     - target: {fileID: 470836, guid: ffe00fa3bd41b9a4db665bf728e3c1e1, type: 3}
       propertyPath: m_LocalScale.x
