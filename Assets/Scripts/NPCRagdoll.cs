@@ -9,6 +9,8 @@ public class NPCRagdoll : MonoBehaviour
     private CapsuleCollider mainCollider;
     private MonoBehaviour NPCController;
 
+    private Vector3 carLinearVelocity;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -28,10 +30,13 @@ public class NPCRagdoll : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         Debug.Log("NPC Ragdoll");
-        Debug.Log("Trigger entered with: " + other.gameObject.name);
+        //Debug.Log("Trigger entered with: " + other.gameObject.name);
         if (other.gameObject.CompareTag("Car"))
         {
             Debug.Log("NPC just got hit by a car!");
+
+            carLinearVelocity = other.gameObject.transform.parent.parent.GetComponent<Rigidbody>().linearVelocity;
+
             Die();
         }
     }
@@ -39,7 +44,7 @@ public class NPCRagdoll : MonoBehaviour
     {
         foreach (Rigidbody rb in ragdollBodies)
         {
-            rb.mass = 4f; // Set mass for all ragdoll parts
+            rb.mass = 10f; // Set mass for all ragdoll parts
         }
     }
 
@@ -49,12 +54,12 @@ public class NPCRagdoll : MonoBehaviour
         {
             rb.isKinematic = !state;
             rb.detectCollisions = state;
-            rb.AddForce(Vector3.up * 50f, ForceMode.Impulse);
+            rb.AddForce((carLinearVelocity + Vector3.up * 30f) * 1.2f, ForceMode.Impulse);
 
             if (state)
             {
                 rb.linearDamping = 2f;
-                rb.angularDamping = 0.75f;
+                rb.angularDamping = 1.5f;
             }
         }
     }
