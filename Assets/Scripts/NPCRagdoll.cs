@@ -39,7 +39,7 @@ public class NPCRagdoll : MonoBehaviour
     {
         foreach (Rigidbody rb in ragdollBodies)
         {
-            rb.mass = 10f; // Set mass to 1 for all ragdoll parts
+            rb.mass = 4f; // Set mass for all ragdoll parts
         }
     }
 
@@ -53,8 +53,8 @@ public class NPCRagdoll : MonoBehaviour
 
             if (state)
             {
-                rb.linearDamping = 2.5f;
-                rb.angularDamping = 2f;
+                rb.linearDamping = 2f;
+                rb.angularDamping = 0.75f;
             }
         }
     }

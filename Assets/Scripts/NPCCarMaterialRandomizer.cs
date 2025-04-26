@@ -27,10 +27,4 @@ public class NPCCarMaterialRandomizer : MonoBehaviour
             renderer.materials = materials; // Apply modified array back
         }
     }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 }
