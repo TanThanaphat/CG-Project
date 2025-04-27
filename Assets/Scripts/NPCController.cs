@@ -10,8 +10,8 @@ public class NPCController : MonoBehaviour
     public float moveInterval = 10f;
     private float moveTimer;
 
-    public float turnAngleThreshold;
-    public float turnDuration;
+    public float turnAngleThreshold = 75f;
+    public float turnDuration = 2f;
 
     private bool isTurning = false;
     private float turnTimer = 0f;
