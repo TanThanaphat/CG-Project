@@ -14,7 +14,7 @@ public class SteeringIK : MonoBehaviour
 
     void OnAnimatorIK(int layerIndex)
     {
-        Debug.Log("IK running!");
+        //Debug.Log("IK running!");
         if (animator)
         {
             // Lean the body forward
