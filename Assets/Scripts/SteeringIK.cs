@@ -14,12 +14,6 @@ public class SteeringIK : MonoBehaviour
 
     void OnAnimatorIK(int layerIndex)
     {
-<<<<<<< HEAD
-        Debug.Log("IK running!");
-||||||| 4955151 (Merge branch 'dev' into test-boss)
-=======
-        //Debug.Log("IK running!");
->>>>>>> parent of 4955151 (Merge branch 'dev' into test-boss)
         if (animator)
         {
             // Lean the body forward

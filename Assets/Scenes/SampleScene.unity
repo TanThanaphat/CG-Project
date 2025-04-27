@@ -703,10 +703,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49c1bc9d8206e3e4f860bc64b7170fed, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-<<<<<<< HEAD
   moveSpeed: 10
   turnSpeed: 60
-||||||| 4955151 (Merge branch 'dev' into test-boss)
 
   maxSpeed: 20
   acceleration: 2
@@ -716,7 +714,6 @@ MonoBehaviour:
   reverseSpeedMultiplier: 0.5
   autoDriveSpeed: 1
 
-=======
   maxSpeed: 20
   acceleration: 2
   deceleration: 8
@@ -724,7 +721,6 @@ MonoBehaviour:
   turnSpeed: 100
   reverseSpeedMultiplier: 0.5
   autoDriveSpeed: 1
->>>>>>> parent of 4955151 (Merge branch 'dev' into test-boss)
   steeringWheel: {fileID: 2095638748}
   steeringWheelMaxAngle: 45
   steeringReturnSpeed: 90
@@ -1832,6 +1828,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
 =======
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+
 --- !u!4 &2095638748 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 424476, guid: ffe00fa3bd41b9a4db665bf728e3c1e1, type: 3}
@@ -1987,13 +1984,4 @@ SceneRoots:
   - {fileID: 81626418}
   - {fileID: 1217884590}
   - {fileID: 1521017982}
-<<<<<<< HEAD
-||||||| 4955151 (Merge branch 'dev' into test-boss)
-  
 
-=======
-  - {fileID: 1821844512}
-  - {fileID: 1187022147}
-  - {fileID: 2084871566}
-  - {fileID: 1639061748}
->>>>>>> parent of 4955151 (Merge branch 'dev' into test-boss)
