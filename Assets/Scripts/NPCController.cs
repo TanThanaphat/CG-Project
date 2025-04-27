@@ -3,12 +3,11 @@ using UnityEngine.AI;
 
 public class NPCController : MonoBehaviour
 {
+    public Transform[] waypoints;
+    private int currentIndex = 0;
+
     private NavMeshAgent agent;
     private Animator animator;
-
-    public float randomMoveRadius = 5f;
-    public float moveInterval = 10f;
-    private float moveTimer;
 
     public float turnAngleThreshold;
     public float turnDuration;
@@ -21,8 +20,8 @@ public class NPCController : MonoBehaviour
         agent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
 
-        moveTimer = moveInterval;
-        MoveToNewDestination();
+        if (waypoints.Length > 0)
+            agent.SetDestination(waypoints[currentIndex].position);
     }
 
     void Update()
@@ -57,27 +56,11 @@ public class NPCController : MonoBehaviour
         // Move animation based on speed
         animator.SetFloat("Speed", agent.velocity.magnitude);
 
-        // Move to target waypoint
-        if (agent.remainingDistance < 0.5f && !agent.pathPending)
+        // Move to next waypoint if close enough
+        if (!agent.pathPending && agent.remainingDistance < 0.5f)
         {
-            moveTimer -= Time.deltaTime;
-            if (moveTimer <= 0f)
-            {
-                MoveToNewDestination();
-                moveTimer = moveInterval;
-            }
-        }
-    }
-
-    private void MoveToNewDestination()
-    {
-        Vector3 randomDirection = Random.insideUnitSphere * randomMoveRadius;
-        randomDirection += transform.position;
-
-        NavMeshHit hit;
-        if (NavMesh.SamplePosition(randomDirection, out hit, randomMoveRadius, NavMesh.AllAreas))
-        {
-            agent.SetDestination(hit.position);
+            currentIndex = (currentIndex + 1) % waypoints.Length;
+            agent.SetDestination(waypoints[currentIndex].position);
         }
     }
 
