@@ -33,6 +33,7 @@ public class CarController : MonoBehaviour
     private bool isBraking = false;
 
     private bool isEngineOn = false;
+    private bool engineJustStarted = false; // เพื่อเช็กว่า Engine เพิ่งเริ่มหรือยัง
 
     private Quaternion initialSteeringRotation;
 
@@ -69,7 +70,8 @@ public class CarController : MonoBehaviour
 
             if (isEngineOn)
             {
-                engineSound?.Play();
+                engineJustStarted = true; // เริ่มเครื่อง
+                Invoke(nameof(PlayEngineSound), 0.5f); // เริ่มเสียง engine หลัง 0.5 วินาที
             }
             else
             {
@@ -83,9 +85,9 @@ public class CarController : MonoBehaviour
 
         if (Mathf.Abs(CurrentSpeed) < 0.1f && canShift)
         {
-            if (Input.GetKeyDown(KeyCode.UpArrow))
-                ShiftGearUp();
             if (Input.GetKeyDown(KeyCode.DownArrow))
+                ShiftGearUp();
+            if (Input.GetKeyDown(KeyCode.UpArrow))
                 ShiftGearDown();
         }
 
@@ -243,8 +245,17 @@ public class CarController : MonoBehaviour
             if (driveSound != null && driveSound.isPlaying)
                 driveSound.Stop();
 
-            if (engineSound != null && !engineSound.isPlaying)
+            if (engineSound != null && !engineSound.isPlaying && !engineJustStarted)
                 engineSound.Play();
         }
+    }
+
+    void PlayEngineSound()
+    {
+        if (engineSound != null && !engineSound.isPlaying)
+        {
+            engineSound.Play();
+        }
+        engineJustStarted = false; // รีเซ็ตหลังจากเล่นเสียง
     }
 }
