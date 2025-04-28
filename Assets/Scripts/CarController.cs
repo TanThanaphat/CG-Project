@@ -56,6 +56,13 @@ public class CarController : MonoBehaviour
 
     void Update()
     {
+        if (PauseMenu.GameIsPaused) {
+            engineSound?.Stop();
+            driveSound?.Stop();
+            brakeSound?.Stop();
+            return;
+        }
+
         HandleInput();
         UpdateSteeringWheel();
         UpdateEngineAndDriveSounds();
