@@ -106,7 +106,7 @@ public class CarController : MonoBehaviour
 
         moveInput = 0f;
         if (currentGear == GearMode.D && Input.GetKey(KeyCode.W)) moveInput = 1f;
-        if (currentGear == GearMode.R && Input.GetKey(KeyCode.S)) moveInput = -1f;
+        if (currentGear == GearMode.R && Input.GetKey(KeyCode.W)) moveInput = -1f;
     }
 
     void ShiftGearUp()
