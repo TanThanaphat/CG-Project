@@ -33,7 +33,7 @@ public class CarController : MonoBehaviour
     private bool isBraking = false;
 
     private bool isEngineOn = false;
-    private bool engineJustStarted = false; // เพื่อเช็กว่า Engine เพิ่งเริ่มหรือยัง
+    private bool engineJustStarted = false; 
 
     private Quaternion initialSteeringRotation;
 
@@ -68,6 +68,7 @@ public class CarController : MonoBehaviour
         UpdateEngineAndDriveSounds();
     }
 
+    // Handle input for gear shifting, movement, and braking    
     void HandleInput()
     {
         if (Input.GetKeyDown(KeyCode.Return))
@@ -77,8 +78,8 @@ public class CarController : MonoBehaviour
 
             if (isEngineOn)
             {
-                engineJustStarted = true; // เริ่มเครื่อง
-                Invoke(nameof(PlayEngineSound), 0.5f); // เริ่มเสียง engine หลัง 0.5 วินาที
+                engineJustStarted = true; 
+                Invoke(nameof(PlayEngineSound), 0.5f); 
             }
             else
             {
@@ -109,6 +110,7 @@ public class CarController : MonoBehaviour
         if (currentGear == GearMode.R && Input.GetKey(KeyCode.W)) moveInput = -1f;
     }
 
+    // Shift gears based on input       
     void ShiftGearUp()
     {
         canShift = false;
@@ -131,7 +133,7 @@ public class CarController : MonoBehaviour
     {
         canShift = true;
     }
-
+    // Update the steering wheel rotation based on input  
     void UpdateSteeringWheel()
     {
         currentSteerInput = Mathf.MoveTowards(currentSteerInput, steerInput,
@@ -160,6 +162,7 @@ public class CarController : MonoBehaviour
         ApplyBraking();
     }
 
+    // Handle car movement and physics    
     void HandleMovement()
     {
         float targetSpeed = 0f;
@@ -188,6 +191,7 @@ public class CarController : MonoBehaviour
         rb.linearVelocity = new Vector3(forwardMovement.x, rb.linearVelocity.y, forwardMovement.z);
     }
 
+    // Handle steering based on input and speed
     void HandleSteering()
     {
         if (Mathf.Abs(currentSpeed) > 0.1f)
@@ -199,6 +203,7 @@ public class CarController : MonoBehaviour
         }
     }
 
+    // Apply braking force to the car
     void ApplyBraking()
     {
         if (isBraking)
@@ -222,6 +227,7 @@ public class CarController : MonoBehaviour
         }
     }
 
+    // Update engine and drive sounds based on car state
     void UpdateEngineAndDriveSounds()
     {
         if (!isEngineOn)
@@ -257,12 +263,13 @@ public class CarController : MonoBehaviour
         }
     }
 
+    // Play the engine sound after a delay when starting the engine
     void PlayEngineSound()
     {
         if (engineSound != null && !engineSound.isPlaying)
         {
             engineSound.Play();
         }
-        engineJustStarted = false; // รีเซ็ตหลังจากเล่นเสียง
+        engineJustStarted = false; 
     }
 }
