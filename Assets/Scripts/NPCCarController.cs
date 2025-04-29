@@ -33,6 +33,9 @@ public class NPCCarController : MonoBehaviour
     private float steerInput;
     private float currentSteerInput;
     private bool isBraking = false;
+    private bool isReversing = false;
+    private float reverseElapsed = 0;
+
     private Quaternion initialSteeringRotation;
 
     private NavMeshPath currentPath;
@@ -44,6 +47,7 @@ public class NPCCarController : MonoBehaviour
 
     [Header("Obstacle Detection Settings")]
     public Transform colliderFront; // Reference to the front collider of the car
+    public Transform colliderBody; // Reference to the car's collider body
     public int numberOfRays = 5; // How many rays you want
     public float raySpreadAngle = 30f; // Total spread (degrees)
     public float rayDistance = 7.5f; // How far to detect
@@ -51,7 +55,7 @@ public class NPCCarController : MonoBehaviour
     void Start()
     {
         maxAngleInFront = UnityEngine.Random.Range(90f, 120f);
-        Debug.Log("Max Angle in Front: " + maxAngleInFront);
+        //Debug.Log("Max Angle in Front: " + maxAngleInFront);
 
         if (rb == null)
             rb = GetComponent<Rigidbody>();
@@ -60,7 +64,7 @@ public class NPCCarController : MonoBehaviour
             initialSteeringRotation = steeringWheel.localRotation;
 
         waypointList = new List<Waypoint>(roadParents.GetComponentsInChildren<Waypoint>());
-        Debug.Log("Waypoints found: " + waypointList.Count);
+        //Debug.Log("Waypoints found: " + waypointList.Count);
 
         agent = GetComponent<NavMeshAgent>();
         if (agent != null)
@@ -157,7 +161,7 @@ public class NPCCarController : MonoBehaviour
         if (bestWaypoint != null)
         {
             traversedWaypointList.Add(bestWaypoint);
-            Debug.Log("Waypoint count: " + traversedWaypointList.Count);
+            //Debug.Log("Waypoint count: " + traversedWaypointList.Count);
             currentTargetWaypoint = bestWaypoint;
             currentPath = bestPath;
             currentPathIndex = 0;
@@ -186,7 +190,7 @@ public class NPCCarController : MonoBehaviour
 
             if (Physics.Raycast(ray, out hit, rayDistance))
             {
-                if (hit.collider.CompareTag("TrafficCollider"))
+                if (hit.collider.CompareTag("TrafficCollider") || hit.collider.CompareTag("CarTraffic"))
                 {
                     float angleBetweenCollider = Vector3.Angle(transform.forward, hit.collider.transform.forward);
                     //Debug.Log(hit.collider.name + " " + angleBetweenCollider + " " + hit.collider.transform.forward);
@@ -194,15 +198,28 @@ public class NPCCarController : MonoBehaviour
                     {
                         Debug.DrawRay(colliderFront.position, direction * hit.distance, Color.red); // For visualization
                         resultBraking = true;
+
+                        colliderBody.gameObject.tag = "CarTraffic";
+
                         break;
                     }
 
                     continue;
+                } else
+                {
+                    colliderBody.gameObject.tag = "Car";
                 }
 
-                Debug.DrawRay(colliderFront.position, direction * hit.distance, Color.red); // For visualization
+                    Debug.DrawRay(colliderFront.position, direction * hit.distance, Color.red); // For visualization
+                //Debug.Log("Detected obstacles in " + transform.name);
 
                 resultBraking = true;
+
+                reverseElapsed = 0;
+
+                if (!DetectObstacleFromBehind())
+                    resultBraking = false;
+
                 break; // We can stop checking after first obstacle detected
             }
             else
@@ -211,9 +228,51 @@ public class NPCCarController : MonoBehaviour
                 resultBraking = false;
             }
         }
+        //Debug.Log("Elapsed time: " + reverseElapsed + " in " + transform.name);
+        reverseElapsed += Time.fixedDeltaTime;
+        if (!resultBraking && reverseElapsed >= 2)
+            isReversing = false;
 
         isBraking = resultBraking;
     }
+
+    bool DetectObstacleFromBehind()
+    {
+        bool resultReversing = false;
+
+        float startAngle = -raySpreadAngle * 0.5f;
+
+        for (int i = 0; i < numberOfRays; i++)
+        {
+            // Calculate angle for this ray
+            float angle = startAngle + (raySpreadAngle / (numberOfRays - 1)) * i;
+
+            // Create the direction by rotating the forward vector
+            Vector3 direction = Quaternion.Euler(0, angle, 0) * -transform.forward;
+
+            // Ray from collider front
+            Ray ray = new Ray(colliderFront.position - transform.forward * 2f, direction);
+            RaycastHit hit;
+
+            if (Physics.Raycast(ray, out hit, rayDistance))
+            {
+                Debug.DrawRay(colliderFront.position, direction * hit.distance, Color.red); // For visualization
+                //Debug.Log("Detect obstacles from behind " + hit.collider.name);
+
+                return true; // We can stop checking after first obstacle detected
+            }
+            else
+            {
+                Debug.DrawRay(colliderFront.position - transform.forward * 2f, direction * rayDistance, Color.green); // For visualization
+                resultReversing = true;
+            }
+        }
+
+        isReversing = resultReversing;
+
+        return false;
+    }
+
     void HandleInput()
     {
         if (currentTargetWaypoint == null)
@@ -222,8 +281,17 @@ public class NPCCarController : MonoBehaviour
             steerInput = 0f;
             return;
         }
-
-        moveInput = 1f;
+        //Debug.Log("isReversing: " + isReversing + " in " + transform.name);
+        if (!isReversing)
+        {
+            moveInput = 1f;
+            turnSpeed = 105f;
+        }
+        else
+        {
+            moveInput = -0.5f;
+            turnSpeed = 0;
+        }
     }
 
     void HandleMovement()
