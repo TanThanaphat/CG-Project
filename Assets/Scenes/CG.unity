@@ -34759,6 +34759,30 @@ PrefabInstance:
       propertyPath: steeringWheel
       value: 
       objectReference: {fileID: 1144919424}
+    - target: {fileID: 8928782356892623652, guid: 75df1da70371cb143820a709deafbca6, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.2452
+      objectReference: {fileID: 0}
+    - target: {fileID: 8928782356892623652, guid: 75df1da70371cb143820a709deafbca6, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.0475
+      objectReference: {fileID: 0}
+    - target: {fileID: 8928782356892623652, guid: 75df1da70371cb143820a709deafbca6, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.0457
+      objectReference: {fileID: 0}
+    - target: {fileID: 9072021079516582528, guid: 75df1da70371cb143820a709deafbca6, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.2232
+      objectReference: {fileID: 0}
+    - target: {fileID: 9072021079516582528, guid: 75df1da70371cb143820a709deafbca6, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.0848
+      objectReference: {fileID: 0}
+    - target: {fileID: 9072021079516582528, guid: 75df1da70371cb143820a709deafbca6, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.0368
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 758312291190073983, guid: 75df1da70371cb143820a709deafbca6, type: 3}
     m_RemovedGameObjects: []
