@@ -1882,7 +1882,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c86b21ce27fe7a5449670e09a991005f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxSpeed: 10
+  maxSpeed: 7
   acceleration: 5
   deceleration: 8
   brakeForce: 15
@@ -1893,6 +1893,7 @@ MonoBehaviour:
   rb: {fileID: 6177717812576923219}
   roadParents: {fileID: 0}
   colliderFront: {fileID: 8184869098174686956}
+  colliderBody: {fileID: 1480908923495554445}
   numberOfRays: 5
   raySpreadAngle: 30
   rayDistance: 7.5
